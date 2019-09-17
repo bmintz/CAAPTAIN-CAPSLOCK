@@ -28,18 +28,18 @@ def get_derived_core_properties():
 	properties = {}
 
 	with open(properties_path) as f:
-		for property, range in parse_properties(f):
-			properties.setdefault(property, set()).update(map(chr, range))
+		for property_, range_ in parse_properties(f):
+			properties.setdefault(property_, set()).update(map(chr, range_))
 
-	return {property: frozenset(chars) for property, chars in properties.items()}
+	return {property_: frozenset(chars) for property_, chars in properties.items()}
 
-def get_derived_core_property(property):
-	desired = property
+def get_derived_core_property(property_):
+	desired = property_
 
 	with open(properties_path) as f:
-		for property, range in parse_properties(f):
-			if property == desired:
-				yield from map(chr, range)
+		for property_, range_ in parse_properties(f):
+			if property_ == desired:
+				yield from map(chr, range_)
 
 def parse_properties(f):
 	for line in map(str.strip, f):
@@ -49,10 +49,10 @@ def parse_properties(f):
 		# ignore trailing comments too
 		line = ''.join(itertools.takewhile(lambda c: c != '#', line))
 
-		range, property = map(str.strip, line.split(';'))
+		range_, property_ = map(str.strip, line.split(';'))
 
-		range = unicode_range_to_range(range)
-		yield property, range
+		range_ = unicode_range_to_range(range_)
+		yield property_, range_
 
 def unicode_range_to_range(range_str):
 	return inclusive_range(*map(hex_to_int, range_str.split('..')))
@@ -60,7 +60,7 @@ def unicode_range_to_range(range_str):
 hex_to_int = functools.partial(int, base=16)
 
 def inclusive_range(start, stop=None, step=1):
-	return range(start, start + 1 if stop is None else stop + 1, step)
+	return range_(start, start + 1 if stop is None else stop + 1, step)
 
 def main():
 	with open(here / 'derived_core_properties.py', 'w') as f:
