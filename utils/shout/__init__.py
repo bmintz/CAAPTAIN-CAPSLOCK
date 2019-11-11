@@ -23,7 +23,9 @@ IGNORED_WORDS = frozenset({
 	'X-P',
 	'P-X',
 	'OwO',
-	'UwU'})
+	'UwU',
+	'TIL',
+})
 
 def is_shout(str):
 	# This import is done here because this is the __init__ file,
