@@ -4,10 +4,6 @@ CREATE TABLE IF NOT EXISTS shout (
 	content TEXT NOT NULL,
 	time TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP);
 
--- old constraint on message content being globally unique
-ALTER TABLE shout DROP CONSTRAINT IF EXISTS shout_content_key;
-
-CREATE INDEX IF NOT EXISTS shout_guild_or_user_idx ON shout (guild_or_user);
 CREATE UNIQUE INDEX IF NOT EXISTS shout_guild_content_unique_idx ON shout (guild_or_user, content);
 
 -- https://stackoverflow.com/a/26284695/1378440
