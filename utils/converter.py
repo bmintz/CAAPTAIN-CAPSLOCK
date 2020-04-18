@@ -33,11 +33,9 @@ class MessageId(Converter):
 		if not channel:
 			raise errors.BadArgument(f'Channel {channel_id} not found.')
 
-		author = channel.guild.get_member(ctx.author.id)
-
 		if not channel.guild.me.permissions_in(channel).read_messages:
 			raise errors.CheckFailure(f"I don't have permission to view channel {channel.mention}.")
-		if not author or not channel.permissions_for(author).read_messages:
+		if not author or not channel.permissions_for(ctx.author).read_messages:
 			raise errors.CheckFailure(f"You don't have permission to view channel {channel.mention}.")
 
 		return (channel, msg_id)
