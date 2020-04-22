@@ -128,7 +128,7 @@ class Shout(commands.Cog):
 			return
 
 		shout = await self.db.get_random_shout(message)
-		if shout: await message.channel.send(shout)  # := when
+		await message.channel.send(shout or "I AIN'T GOT NOTHIN' ON THAT")
 		sanitized = self.bot.clean_content(content=message.content, guild=message.guild)
 		await self.db.save_shout(message, sanitized)
 
