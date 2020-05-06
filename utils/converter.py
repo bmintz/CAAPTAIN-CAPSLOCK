@@ -35,7 +35,7 @@ class MessageId(Converter):
 
 		if not channel.guild.me.permissions_in(channel).read_messages:
 			raise errors.CheckFailure(f"I don't have permission to view channel {channel.mention}.")
-		if not author or not channel.permissions_for(ctx.author).read_messages:
+		if not channel.permissions_for(ctx.author).read_messages:
 			raise errors.CheckFailure(f"You don't have permission to view channel {channel.mention}.")
 
 		return (channel, msg_id)
