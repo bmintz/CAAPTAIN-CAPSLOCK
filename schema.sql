@@ -16,7 +16,7 @@
 CREATE TABLE IF NOT EXISTS shout (
 	guild_or_user BIGINT NOT NULL,
 	message BIGINT NOT NULL PRIMARY KEY,
-	content TEXT NOT NULL,
+	content BYTEA NOT NULL,
 	time TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP);
 
 CREATE UNIQUE INDEX IF NOT EXISTS shout_guild_content_unique_idx ON shout (guild_or_user, content);

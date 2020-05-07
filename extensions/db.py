@@ -32,31 +32,32 @@ class Database(commands.Cog):
 	async def save_shout(self, message, content):
 		guild_or_user = get_guild_or_user(message)
 		await self.bot.pool.execute("""
-			INSERT INTO shout(guild_or_user, message, content)
-			VALUES($1, $2, $3)
+			INSERT INTO shout (guild_or_user, message, content)
+			VALUES ($1, $2, pgp_sym_encrypt($3, $4))
 			ON CONFLICT DO NOTHING
-		""", guild_or_user, message.id, content)
+		""", guild_or_user, message.id, content, self.bot.config['encryption_key'])
 
-	async def get_random_shout(self, message=None):
-		args = []
+	async def get_random_shout(self, message):
 		query = """
-			SELECT content
+			SELECT pgp_sym_decrypt(content, $2)
 			FROM shout
-		"""
-
-		if message is not None:
-			query += 'WHERE guild_or_user = $1'
-			args.append(get_guild_or_user(message))
-
-		query += """
-			ORDER BY random()
+			WHERE guild_or_user = $1
+			OFFSET FLOOR(RANDOM() * (
+				SELECT COUNT(*)
+				FROM shout
+				WHERE guild_or_user = $1
+			))
 			LIMIT 1
 		"""
 
-		return await self.bot.pool.fetchval(query, *args)
+		return await self.bot.pool.fetchval(query, get_guild_or_user(message), self.bot.config['encryption_key'])
 
 	async def get_shout(self, message_id):
-		return await self.bot.pool.fetchval('SELECT content FROM shout WHERE message = $1', message_id)
+		return await self.bot.pool.fetchval("""
+			SELECT pgp_sym_decrypt(content, $2)
+			FROM shout
+			WHERE message = $1
+		""", message_id, self.bot.config['encryption_key'])
 
 	async def delete_shout(self, message_id):
 		tag = await self.bot.pool.execute('DELETE FROM shout WHERE message = $1', message_id)
@@ -134,7 +135,7 @@ class Database(commands.Cog):
 
 def get_guild_or_user(message):
 	try:
-		return message.channel.guild.id
+		return message.guild.id
 	except AttributeError:
 		return message.author.id
 
