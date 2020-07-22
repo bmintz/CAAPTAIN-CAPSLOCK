@@ -23,8 +23,8 @@ class Database(commands.Cog):
 	async def update_shout(self, message_id, content):
 		try:
 			await self.bot.pool.execute(
-				'UPDATE shout SET content = $2 WHERE message = $1',
-				message_id, content)
+				'UPDATE shout SET content = pgp_sym_encrypt($2, $3) WHERE message = $1',
+				message_id, content, self.bot.config['encryption_key'])
 		except asyncpg.UniqueViolationError:
 			# don't store duplicate shouts
 			await self.bot.pool.execute('DELETE FROM shout WHERE message = $1', message_id)
