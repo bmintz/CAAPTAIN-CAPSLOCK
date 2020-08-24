@@ -7,9 +7,14 @@ A Discord bot that shouts at you when you shout at it.
 
 ## How does it operate?
 
-Say something. Say anything. But say it LOUDLY. The cap' will log what you say (for your server only) and
-shout something random back at you. The more you shout at it, the bigger its repertoire gets.
+Say something. Say anything. But say it LOUDLY. The cap' will log what you say (for your server only), and
+60% of the time, shout something random back at you. The more you shout at it, the bigger its repertoire gets.
 Duplicate text will not be logged.
+
+## Why doesn't it respond all the time?
+
+In practice, responding 100% of the time causes shouting matches and bickering with the bot. Responding 60% of the time
+prevents it from always having the last word.
 
 ## What about message deletes/edits?
 
