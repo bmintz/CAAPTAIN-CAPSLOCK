@@ -23,51 +23,49 @@ class Database(commands.Cog):
 	async def update_shout(self, message_id, content):
 		try:
 			await self.bot.pool.execute(
-				'UPDATE shout SET content = pgp_sym_encrypt($2, $3) WHERE message = $1',
+				'UPDATE shouts SET content = pgp_sym_encrypt($2, $3) WHERE message_id = $1',
 				message_id, content, self.bot.config['encryption_key'])
 		except asyncpg.UniqueViolationError:
 			# don't store duplicate shouts
-			await self.bot.pool.execute('DELETE FROM shout WHERE message = $1', message_id)
+			await self.bot.pool.execute('DELETE FROM shouts WHERE message_id = $1', message_id)
 
 	async def save_shout(self, message, content):
-		guild_or_user = get_guild_or_user(message)
 		await self.bot.pool.execute("""
-			INSERT INTO shout (guild_or_user, message, content)
+			INSERT INTO shouts (guild_id, message_id, content)
 			VALUES ($1, $2, pgp_sym_encrypt($3, $4))
 			ON CONFLICT DO NOTHING
-		""", guild_or_user, message.id, content, self.bot.config['encryption_key'])
+		""", message.guild.id, message.id, content, self.bot.config['encryption_key'])
 
 	async def get_random_shout(self, message):
 		query = """
 			SELECT pgp_sym_decrypt(content, $2)
-			FROM shout
-			WHERE guild_or_user = $1
+			FROM shouts
+			WHERE guild_id = $1
 			OFFSET FLOOR(RANDOM() * (
 				SELECT COUNT(*)
-				FROM shout
-				WHERE guild_or_user = $1
+				FROM shouts
+				WHERE guild_id = $1
 			))
 			LIMIT 1
 		"""
-
-		return await self.bot.pool.fetchval(query, get_guild_or_user(message), self.bot.config['encryption_key'])
+		return await self.bot.pool.fetchval(query, message.guild.id, self.bot.config['encryption_key'])
 
 	async def get_shout(self, message_id):
 		return await self.bot.pool.fetchval("""
 			SELECT pgp_sym_decrypt(content, $2)
-			FROM shout
-			WHERE message = $1
+			FROM shouts
+			WHERE message_id = $1
 		""", message_id, self.bot.config['encryption_key'])
 
 	async def delete_shout(self, message_id):
-		tag = await self.bot.pool.execute('DELETE FROM shout WHERE message = $1', message_id)
+		tag = await self.bot.pool.execute('DELETE FROM shouts WHERE message_id = $1', message_id)
 		return int(tag.split()[-1])
 
 	async def delete_shouts(self, message_ids):
-		await self.bot.pool.executemany('DELETE FROM shout WHERE message = $1', [(id,) for id in message_ids])
+		await self.bot.pool.executemany('DELETE FROM shouts WHERE message_id = $1', [(id,) for id in message_ids])
 
-	async def delete_by_guild_or_user(self, guild_or_user):
-		await self.bot.pool.execute('DELETE FROM shout WHERE guild_or_user = $1', guild_or_user)
+	async def delete_by_guild_id(self, guild_id):
+		await self.bot.pool.execute('DELETE FROM shouts WHERE guild_id = $1', guild_id)
 
 	async def _toggle_state(self, table_name, id, default_new_state):
 		"""toggle the state for a user or guild. If there's no entry already, new state = default_new_state."""
@@ -132,12 +130,6 @@ class Database(commands.Cog):
 		if guild_id is None:
 			return True
 		return await self.get_guild_state(guild_id)
-
-def get_guild_or_user(message):
-	try:
-		return message.guild.id
-	except AttributeError:
-		return message.author.id
 
 def setup(bot):
 	bot.add_cog(Database(bot))

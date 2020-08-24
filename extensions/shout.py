@@ -117,6 +117,9 @@ class Shout(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_message(self, message):
+		if not message.guild:
+			return
+
 		if not is_shout(message.content) or not self.bot.should_reply(message):
 			return
 
@@ -125,9 +128,7 @@ class Shout(commands.Cog):
 			# don't respond here if the user has sent a command
 			return
 
-		guild = message.guild and message.guild.id
-
-		if not await self.db.get_state(guild, message.author.id):
+		if not await self.db.get_state(message.guild.id, message.author.id):
 			return
 
 		# Reduce spam and prevent the bot from always having the last word.
@@ -135,6 +136,7 @@ class Shout(commands.Cog):
 		if random() < SHOUT_RESPONSE_PROBABILITY:
 			shout = await self.db.get_random_shout(message)
 			await message.channel.send(shout or "I AIN'T GOT NOTHIN' ON THAT")
+
 		sanitized = self.bot.clean_content(content=message.content, guild=message.guild)
 		await self.db.save_shout(message, sanitized)
 

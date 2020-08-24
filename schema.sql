@@ -13,16 +13,16 @@
 -- You should have received a copy of the GNU Affero General Public License
 -- along with CAPTAIN CAPSLOCK.  If not, see <https://www.gnu.org/licenses/>.
 
-CREATE TABLE IF NOT EXISTS shout (
-	guild_or_user BIGINT NOT NULL,
-	message BIGINT NOT NULL PRIMARY KEY,
+CREATE TABLE shouts (
+	guild_id BIGINT NOT NULL,
+	message_id BIGINT NOT NULL PRIMARY KEY,
 	content BYTEA NOT NULL,
 	time TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP);
 
-CREATE UNIQUE INDEX IF NOT EXISTS shout_guild_content_unique_idx ON shout (guild_or_user, content);
+CREATE UNIQUE INDEX shout_content_uniq_idx ON shout (guild_id, content);
 
 -- https://stackoverflow.com/a/26284695/1378440
-CREATE OR REPLACE FUNCTION update_time_column()
+CREATE FUNCTION update_time_column()
 RETURNS TRIGGER AS $$ BEGIN
 	IF row(NEW.content) IS DISTINCT FROM row(OLD.content) THEN
 		NEW.time = CURRENT_TIMESTAMP;
@@ -30,16 +30,14 @@ RETURNS TRIGGER AS $$ BEGIN
 	ELSE
 		RETURN OLD; END IF; END; $$ language 'plpgsql';
 
-DROP TRIGGER IF EXISTS update_shout_time ON shout;
-
 CREATE TRIGGER update_shout_time
 BEFORE UPDATE ON shout
 FOR EACH ROW EXECUTE PROCEDURE update_time_column();
 
-CREATE TABLE IF NOT EXISTS guild_opt (
+CREATE TABLE guild_opt (
 	id BIGINT NOT NULL UNIQUE,
 	state BOOLEAN NOT NULL);
 
-CREATE TABLE IF NOT EXISTS user_opt (
+CREATE TABLE user_opt (
 	id BIGINT NOT NULL UNIQUE,
 	state BOOLEAN NOT NULL);
