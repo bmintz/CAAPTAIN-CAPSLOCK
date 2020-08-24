@@ -147,7 +147,11 @@ class Shout(commands.Cog):
 
 		id = payload.message_id
 		if 'content' not in payload.data:
-			message = payload.cached_message or await self.bot.get_channel(payload.channel_id).fetch_message(id)
+			try:
+				message = payload.cached_message or await self.bot.get_channel(payload.channel_id).fetch_message(id)
+			except discord.HTTPException:
+				return
+
 			content = message.content
 			guild = message.guild
 		else:
