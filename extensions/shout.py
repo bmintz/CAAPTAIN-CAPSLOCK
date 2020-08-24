@@ -15,6 +15,7 @@
 
 import logging
 import re
+from random import random
 
 from discord.ext import commands
 
@@ -24,6 +25,8 @@ from utils.converter import Message
 logger = logging.getLogger(__name__)
 CODEBLOCK_RE = re.compile(r'(`{1,3}).+?\1', re.DOTALL)
 MENTION_RE = re.compile(r'<(?:&|#|@!?)\d+>|@everyone|@here', re.ASCII)
+# how likely the bot is to respond with a random shout (shouts will always be logged regardless of this value)
+SHOUT_RESPONSE_PROBABILITY = 0.6
 
 def is_shout(content):
 	without_code = CODEBLOCK_RE.sub('', content)
@@ -127,8 +130,11 @@ class Shout(commands.Cog):
 		if not await self.db.get_state(guild, message.author.id):
 			return
 
-		shout = await self.db.get_random_shout(message)
-		await message.channel.send(shout or "I AIN'T GOT NOTHIN' ON THAT")
+		# Reduce spam and prevent the bot from always having the last word.
+		# In practice, responding 100% of the time causes bickering with users.
+		if random() < SHOUT_RESPONSE_PROBABILITY:
+			shout = await self.db.get_random_shout(message)
+			await message.channel.send(shout or "I AIN'T GOT NOTHIN' ON THAT")
 		sanitized = self.bot.clean_content(content=message.content, guild=message.guild)
 		await self.db.save_shout(message, sanitized)
 
