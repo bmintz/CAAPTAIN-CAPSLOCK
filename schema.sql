@@ -26,9 +26,8 @@ CREATE FUNCTION update_time_column()
 RETURNS TRIGGER AS $$ BEGIN
 	IF row(NEW.content) IS DISTINCT FROM row(OLD.content) THEN
 		NEW.time = CURRENT_TIMESTAMP;
-		RETURN NEW;
-	ELSE
-		RETURN OLD; END IF; END; $$ language 'plpgsql';
+	END IF;
+	RETURN NEW; END; $$ language 'plpgsql';
 
 CREATE TRIGGER update_shout_time
 BEFORE UPDATE ON shout
