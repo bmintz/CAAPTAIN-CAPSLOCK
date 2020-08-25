@@ -30,7 +30,7 @@ RETURNS TRIGGER AS $$ BEGIN
 	RETURN NEW; END; $$ language 'plpgsql';
 
 CREATE TRIGGER update_shout_time
-BEFORE UPDATE ON shout
+BEFORE UPDATE ON shouts
 FOR EACH ROW EXECUTE PROCEDURE update_time_column();
 
 CREATE TABLE guild_opt (
