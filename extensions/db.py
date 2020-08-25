@@ -55,10 +55,12 @@ class Database(commands.Cog):
 		return int(tag.split()[-1])
 
 	async def delete_shouts(self, message_ids):
-		await self.bot.pool.executemany('DELETE FROM shouts WHERE message_id = $1', [(id,) for id in message_ids])
+		tag = await self.bot.pool.execute('DELETE FROM shouts WHERE message_id = ANY ($1)', message_ids)
+		return int(tag.split()[-1])
 
 	async def delete_by_guild_id(self, guild_id):
-		await self.bot.pool.execute('DELETE FROM shouts WHERE guild_id = $1', guild_id)
+		tag = await self.bot.pool.execute('DELETE FROM shouts WHERE guild_id = $1', guild_id)
+		return int(tag.split()[-1])
 
 	async def _toggle_state(self, table_name, id, default_new_state):
 		"""toggle the state for a user or guild. If there's no entry already, new state = default_new_state."""
