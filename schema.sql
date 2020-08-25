@@ -16,10 +16,10 @@
 CREATE TABLE shouts (
 	guild_id BIGINT NOT NULL,
 	message_id BIGINT NOT NULL PRIMARY KEY,
-	content BYTEA NOT NULL,
+	content TEXT NOT NULL,
 	time TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP);
 
-CREATE UNIQUE INDEX shout_content_uniq_idx ON shout (guild_id, content);
+CREATE UNIQUE INDEX shout_content_uniq_idx ON shouts (guild_id, content);
 
 -- https://stackoverflow.com/a/26284695/1378440
 CREATE FUNCTION update_time_column()

@@ -23,8 +23,8 @@ class Database(commands.Cog):
 	async def update_shout(self, message_id, content):
 		try:
 			await self.bot.pool.execute(
-				'UPDATE shouts SET content = pgp_sym_encrypt($2, $3) WHERE message_id = $1',
-				message_id, content, self.bot.config['encryption_key'])
+				'UPDATE shouts SET content = $2 WHERE message_id = $1',
+				message_id, content)
 		except asyncpg.UniqueViolationError:
 			# don't store duplicate shouts
 			await self.bot.pool.execute('DELETE FROM shouts WHERE message_id = $1', message_id)
@@ -32,13 +32,13 @@ class Database(commands.Cog):
 	async def save_shout(self, message, content):
 		await self.bot.pool.execute("""
 			INSERT INTO shouts (guild_id, message_id, content)
-			VALUES ($1, $2, pgp_sym_encrypt($3, $4))
+			VALUES ($1, $2, $3)
 			ON CONFLICT DO NOTHING
-		""", message.guild.id, message.id, content, self.bot.config['encryption_key'])
+		""", message.guild.id, message.id, content)
 
 	async def get_random_shout(self, message):
 		query = """
-			SELECT pgp_sym_decrypt(content, $2)
+			SELECT content
 			FROM shouts
 			WHERE guild_id = $1
 			OFFSET FLOOR(RANDOM() * (
@@ -48,14 +48,7 @@ class Database(commands.Cog):
 			))
 			LIMIT 1
 		"""
-		return await self.bot.pool.fetchval(query, message.guild.id, self.bot.config['encryption_key'])
-
-	async def get_shout(self, message_id):
-		return await self.bot.pool.fetchval("""
-			SELECT pgp_sym_decrypt(content, $2)
-			FROM shouts
-			WHERE message_id = $1
-		""", message_id, self.bot.config['encryption_key'])
+		return await self.bot.pool.fetchval(query, message.guild.id)
 
 	async def delete_shout(self, message_id):
 		tag = await self.bot.pool.execute('DELETE FROM shouts WHERE message_id = $1', message_id)
