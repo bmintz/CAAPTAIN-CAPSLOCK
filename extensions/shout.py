@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 CODEBLOCK_RE = re.compile(r'(`{1,3}).+?\1', re.DOTALL)
 MENTION_RE = re.compile(r'<(?:&|#|@!?)\d+>|@everyone|@here', re.ASCII)
 # how likely the bot is to respond with a random shout (shouts will always be logged regardless of this value)
-SHOUT_RESPONSE_PROBABILITY = 0.6
+SHOUT_RESPONSE_PROBABILITY = 0.4
 
 def is_shout(content):
 	without_code = CODEBLOCK_RE.sub('', content)
