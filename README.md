@@ -13,7 +13,7 @@ Duplicate text will not be logged.
 
 ## Why doesn't it respond all the time?
 
-In practice, responding 100% of the time causes shouting matches and bickering with the bot. Responding 60% of the time
+In practice, responding 100% of the time causes shouting matches and bickering with the bot. Responding 40% of the time
 prevents it from always having the last word.
 
 ## What about message deletes/edits?
