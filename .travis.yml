@@ -1,6 +1,10 @@
-dist: bionic
-language: python
-python:
-  - 3.6
-script:
-  - python tests.py
+{
+    "dist": "bionic",
+    "language": "python",
+    "python": [
+        3.6
+    ],
+    "script": [
+        "python tests.py"
+    ]
+}
