@@ -54,10 +54,11 @@ You'll need PostgreSQL 11+ and python3.6+.
 ```
 $ createdb captain_capslock
 $ psql captain_capslock -f schema.sql
-$ cp data/config.example.json data/config.json
-$ # edit config.json as needed
+$ cp data/config.example.py data/config.py
+$ # edit config.py as needed
 $ python3 -m venv .venv
 $ source .venv/bin/activate
+$ pip install -r requirements.txt
 $ ./bot.py
 ```
 
