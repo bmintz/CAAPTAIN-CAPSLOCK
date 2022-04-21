@@ -3,11 +3,9 @@
 	"copyright_license_file": "data/short-license.txt",
 
 	"database": {
-		"url": "you can use this instead of the below data. if both are specified, url will take precedence",
-
-		"user": "captaincapslock",
+		"user": "captain_capslock",
 		"password": "hunter2",
-		"database": "captaincapslock",
+		"database": "captain_capslock",
 		"host": "localhost",
 		"port": 5432,
 	},
